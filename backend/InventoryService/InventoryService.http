@@ -1,0 +1,50 @@
+@InventoryService_HostAddress = http://localhost:5001
+
+GET {{InventoryService_HostAddress}}/health
+Accept: application/json
+
+###
+
+POST {{InventoryService_HostAddress}}/api/produtos
+Content-Type: application/json
+
+{
+  "codigo": "PROD-001",
+  "descricao": "Teclado Mecanico",
+  "saldo": 10
+}
+
+###
+
+GET {{InventoryService_HostAddress}}/api/produtos
+Accept: application/json
+
+###
+
+POST {{InventoryService_HostAddress}}/api/estoque/validar
+Content-Type: application/json
+
+{
+  "itens": [
+    {
+      "produtoId": "00000000-0000-0000-0000-000000000000",
+      "quantidade": 2
+    }
+  ]
+}
+
+###
+
+POST {{InventoryService_HostAddress}}/api/estoque/consumir
+Content-Type: application/json
+
+{
+  "itens": [
+    {
+      "produtoId": "00000000-0000-0000-0000-000000000000",
+      "quantidade": 2
+    }
+  ]
+}
+
+###

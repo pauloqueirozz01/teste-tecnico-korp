@@ -2,7 +2,7 @@
 
 Projeto de avaliação técnica para a Korp.
 
-O projeto está em desenvolvimento incremental por specs. A fundação backend da SPEC-001 foi criada, o InventoryService foi implementado na SPEC-002 e o domínio inicial do BillingService foi implementado na SPEC-003. Impressão, integração entre microsserviços, resiliência e frontend ainda estão planejados para próximas specs.
+O projeto está em desenvolvimento incremental por specs. A fundação backend, o InventoryService, o BillingService, o processamento da nota fiscal e a resiliência HTTP entre microsserviços já foram implementados. O frontend Angular permanece planejado para próximas specs.
 
 ## Objetivo
 
@@ -12,7 +12,7 @@ Construir uma aplicação simples para gerenciamento de produtos, estoque e emis
 
 - `frontend/korp-web`: frontend Angular planejado com componentes standalone.
 - `backend/InventoryService`: API ASP.NET Core funcional para produtos, validação de estoque e consumo de estoque.
-- `backend/BillingService`: API ASP.NET Core funcional para criação e consulta de notas fiscais.
+- `backend/BillingService`: API ASP.NET Core funcional para criação, consulta, processamento e download de notas fiscais.
 - `backend/tests`: projetos de teste xUnit.
 - `docs/architecture.md`: documentação pública da arquitetura.
 - `docs/presentation-script.md`: estrutura inicial do roteiro da apresentação técnica.
@@ -28,6 +28,7 @@ As especificações internas de implementação ficam em `docs/specs/`, mas essa
 - PostgreSQL
 - xUnit
 - Swashbuckle/Swagger UI
+- Microsoft.Extensions.Http.Resilience `10.9.0`
 - Docker Compose
 - dotnet-ef como ferramenta local em `backend/dotnet-tools.json`
 - Angular, TypeScript e RxJS planejados para o frontend
@@ -58,6 +59,8 @@ Funcionalidades implementadas:
 - consulta de produto por ID.
 - validação de estoque.
 - consumo atômico de estoque.
+- reposição de estoque para compensação.
+- idempotência persistida para consumo e reposição via header `Idempotency-Key`.
 - tratamento de produtos repetidos na mesma solicitação.
 - respostas de erro padronizadas em Português Brasileiro.
 
@@ -70,6 +73,12 @@ Entidade persistida:
   - `Saldo`
   - `CriadoEm`
   - `AtualizadoEm`
+- `OperacaoEstoqueIdempotente`
+  - `Id`
+  - `Chave`
+  - `Tipo`
+  - `RespostaJson`
+  - `CriadaEm`
 
 Regras implementadas:
 
@@ -79,6 +88,7 @@ Regras implementadas:
 - consumo de estoque valida todos os itens antes de alterar saldos.
 - produtos repetidos são agrupados antes da validação.
 - nenhum consumo pode deixar saldo negativo.
+- chamadas repetidas com a mesma chave idempotente retornam resposta compatível sem alterar novamente o saldo.
 
 Endpoints:
 
@@ -88,6 +98,7 @@ GET  /api/produtos
 GET  /api/produtos/{id}
 POST /api/estoque/validar
 POST /api/estoque/consumir
+POST /api/estoque/repor
 ```
 
 Exemplo de cadastro:
@@ -176,7 +187,7 @@ curl -X POST http://localhost:5002/api/notas-fiscais \
   -d '{"itens":[{"produtoId":"ID_DO_PRODUTO","codigoProduto":"PROD-001","descricaoProduto":"Teclado Mecânico","quantidade":2}]}'
 ```
 
-Observação: nesta etapa, `CodigoProduto` e `DescricaoProduto` são recebidos no request como snapshot transitório. A origem desses dados será revisada quando o BillingService for integrado ao InventoryService.
+Observação: `CodigoProduto` e `DescricaoProduto` são recebidos no request como snapshot da nota. A consistência do saldo é responsabilidade do InventoryService durante o processamento.
 
 ### Processamento e impressão
 
@@ -188,11 +199,50 @@ O processamento está implementado no BillingService por meio de `POST /api/nota
 4. finaliza o arquivo como `NF-000001.txt`;
 5. registra metadados e fecha a nota.
 
-Em caso de falha após o consumo, o BillingService tenta compensar a operação usando `POST /api/estoque/repor`. Essa compensação reduz a janela de inconsistência, mas não é uma transação distribuída. Se o próprio InventoryService estiver indisponível durante a compensação, a ocorrência deve ser tratada operacionalmente e será aprofundada na SPEC-005.
+Em caso de falha após o consumo, o BillingService tenta compensar a operação usando `POST /api/estoque/repor`. Consumo e compensação usam chaves idempotentes determinísticas no formato `consumo-nota-<id>` e `compensacao-nota-<id>`, permitindo retry seguro sem duplicar movimentações.
+
+Se a compensação também falhar, a nota permanece `Aberta`, o sistema registra log crítico e retorna `FALHA_COMPENSACAO_ESTOQUE`. Essa situação representa uma janela de inconsistência operacional e não é mascarada como sucesso.
 
 O download é feito por `GET /api/notas-fiscais/{id}/arquivo` e retorna `text/plain`. Notas abertas não possuem arquivo definitivo disponível.
 
-O endereço do InventoryService é configurado por `InventoryService__BaseUrl` ou pela seção `InventoryService:BaseUrl` dos arquivos de configuração. O timeout básico atual é de 5 segundos. Retry e circuit breaker permanecem planejados para a SPEC-005.
+O endereço do InventoryService é configurado por `InventoryService__BaseUrl` ou pela seção `InventoryService:BaseUrl` dos arquivos de configuração. O timeout atual é de 5 segundos.
+
+### Resiliência entre microsserviços
+
+O BillingService usa `IHttpClientFactory` com `Microsoft.Extensions.Http.Resilience` `10.9.0` para a comunicação com o InventoryService.
+
+Configuração padrão:
+
+```json
+"InventoryService": {
+  "BaseUrl": "http://localhost:5001",
+  "TimeoutSeconds": 5,
+  "Resilience": {
+    "RetryCount": 2,
+    "RetryBaseDelayMilliseconds": 200,
+    "CircuitBreakerFailureRatio": 0.5,
+    "CircuitBreakerMinimumThroughput": 4,
+    "CircuitBreakerSamplingSeconds": 10,
+    "CircuitBreakerBreakSeconds": 15
+  }
+}
+```
+
+Falhas transitórias recebem retry pequeno com backoff exponencial e jitter: erro de conexão, timeout controlado, HTTP `500`, `502`, `503` e `504`.
+
+Falhas de negócio não recebem retry: `400`, `404`, `409`, produto inexistente, saldo insuficiente e requisição inválida.
+
+Quando o InventoryService está indisponível ou o circuit breaker está aberto, o BillingService retorna resposta controlada:
+
+```json
+{
+  "codigo": "INVENTORY_SERVICE_INDISPONIVEL",
+  "mensagem": "O serviço de estoque está temporariamente indisponível. Tente novamente em alguns instantes.",
+  "status": 503
+}
+```
+
+Nessas falhas, a nota permanece `Aberta` e nenhum arquivo definitivo fica disponível. O BillingService continua respondendo endpoints independentes como `GET /health`, `GET /api/notas-fiscais` e `GET /api/notas-fiscais/{id}`.
 
 ## Migrations
 
@@ -224,7 +274,7 @@ dotnet tool run dotnet-ef database update \
   --startup-project BillingService/BillingService.csproj
 ```
 
-A migration `AdicionarMetadadosProcessamentoNota` adiciona os metadados do arquivo e o controle otimista do processamento.
+A migration `AdicionarMetadadosProcessamentoNota` adiciona os metadados do arquivo e o controle otimista do processamento. A migration `AdicionarOperacoesEstoqueIdempotentes` adiciona a persistência das chaves idempotentes do InventoryService.
 
 ## Estrutura backend
 

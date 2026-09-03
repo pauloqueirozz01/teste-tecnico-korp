@@ -1,0 +1,55 @@
+# Node / Angular
+node_modules/
+dist/
+.angular/
+coverage/
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# .NET
+bin/
+obj/
+TestResults/
+*.user
+*.suo
+
+# IDEs
+.vs/
+.idea/
+.vscode/settings.json
+
+# Ambiente e segredos
+.env
+.env.*
+!.env.example
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+
+# Dados/runtime
+storage/
+generated/
+generated-files/
+
+# Artefatos de IA e documentação interna
+.ai/
+.agent/
+.agents/
+.codex/
+skills/
+.skill/
+specs/
+docs/specs/
+prompts/
+.ai-prompts/
+.agent-work/
+.agent-reports/
+tmp/
+.temp/
+AGENTS.md
+CLAUDE.md
+CODEX.md
+SKILLS.md
+

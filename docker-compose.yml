@@ -1,0 +1,39 @@
+services:
+  postgres-inventory:
+    image: postgres:16-alpine
+    container_name: korp-postgres-inventory
+    environment:
+      POSTGRES_DB: korp_inventory
+      POSTGRES_USER: korp_dev
+      POSTGRES_PASSWORD: korp_dev_password
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_inventory_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U korp_dev -d korp_inventory"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  postgres-billing:
+    image: postgres:16-alpine
+    container_name: korp-postgres-billing
+    environment:
+      POSTGRES_DB: korp_billing
+      POSTGRES_USER: korp_dev
+      POSTGRES_PASSWORD: korp_dev_password
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres_billing_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U korp_dev -d korp_billing"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_inventory_data:
+  postgres_billing_data:
+
