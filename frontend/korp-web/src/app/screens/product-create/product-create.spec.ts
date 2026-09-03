@@ -58,7 +58,35 @@ describe('ProductCreateScreen', () => {
       descricao: 'Teclado',
       saldo: 10
     });
-    expect(router.navigate).toHaveBeenCalledWith(['/produtos'], { queryParams: { criado: '1' } });
+    expect(router.navigate).toHaveBeenCalledWith(['/produtos'], { state: { produtoCriado: true } });
+  });
+
+  it('deve navegar para listagem ao cancelar', () => {
+    const criarProduto = jasmine.createSpy();
+    const fixture = criarTela(criarProduto);
+    const router = TestBed.inject(Router);
+    spyOn(router, 'navigate');
+    fixture.detectChanges();
+
+    fixture.debugElement.query(By.css('button[type="button"]')).nativeElement.click();
+
+    expect(criarProduto).not.toHaveBeenCalled();
+    expect(router.navigate).toHaveBeenCalledWith(['/produtos']);
+  });
+
+  it('deve manter usuário na tela e não chamar service quando submit for inválido', () => {
+    const criarProduto = jasmine.createSpy();
+    const fixture = criarTela(criarProduto);
+    const router = TestBed.inject(Router);
+    spyOn(router, 'navigate');
+    fixture.detectChanges();
+
+    fixture.debugElement.query(By.css('form')).triggerEventHandler('ngSubmit');
+    fixture.detectChanges();
+
+    expect(criarProduto).not.toHaveBeenCalled();
+    expect(router.navigate).not.toHaveBeenCalled();
+    expect(fixture.nativeElement.textContent).toContain('Informe o código do produto.');
   });
 
   it('deve exibir erro quando API recusar cadastro', () => {

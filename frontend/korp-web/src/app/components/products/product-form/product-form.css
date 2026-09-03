@@ -51,7 +51,7 @@ input:focus {
 }
 
 button,
-:host ::ng-deep [form-secondary-action] {
+.secondary-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -73,10 +73,12 @@ button:disabled {
   opacity: 0.7;
 }
 
-:host ::ng-deep [form-secondary-action] {
+.secondary-button {
   border: 1px solid var(--color-border);
   color: var(--color-text);
+  background: var(--color-surface);
   text-decoration: none;
+  cursor: pointer;
 }
 
 @media (max-width: 640px) {

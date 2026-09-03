@@ -53,7 +53,7 @@ A configuração das APIs fica em `src/environments` e `API_CONFIG`:
 - InventoryService: `http://localhost:5001`
 - BillingService: `http://localhost:5002`
 
-Foi escolhida comunicação direta com as APIs usando CORS já configurado nos backends para `http://localhost:4200`; não há proxy Angular nesta etapa.
+Foi escolhida comunicação direta com as APIs usando CORS já configurado nos backends para `http://localhost:4200` e `http://127.0.0.1:4200`; não há proxy Angular nesta etapa.
 
 Tratamento de erros:
 
@@ -87,7 +87,7 @@ Tela `/produtos/novo`:
 - valida saldo inicial obrigatório e não negativo;
 - usa `ProdutoService.criarProduto`;
 - usa `catchError` e `finalize` para erro e loading;
-- após sucesso, navega para `/produtos?criado=1`, onde a listagem exibe o feedback de sucesso e recarrega os produtos.
+- após sucesso, navega para `/produtos` com `history.state`, onde a listagem exibe o feedback de sucesso uma única vez e recarrega os produtos.
 
 Componentes adicionados em `components/products`:
 
@@ -284,7 +284,7 @@ Cada serviço possui:
   - PostgreSQL InventoryService: `localhost:5433`.
   - PostgreSQL BillingService: `localhost:5434`.
 - Swashbuckle foi usado para Swagger UI porque atende à exigência de OpenAPI/Swagger com uma interface de desenvolvimento simples.
-- A configuração de CORS aceita `http://localhost:4200` em desenvolvimento, preparando o consumo futuro pelo Angular.
+- A configuração de CORS aceita `http://localhost:4200` e `http://127.0.0.1:4200` em desenvolvimento, preparando o consumo pelo Angular em ambas as origens locais.
 - O redirecionamento HTTPS não é aplicado em `Development` para permitir health checks HTTP locais diretos.
 
 ## InventoryService

@@ -17,12 +17,14 @@ pnpm install
 pnpm start
 ```
 
-A aplicação roda em `http://localhost:4200`.
+A aplicação roda em `http://localhost:4200`. O dev server também pode ser iniciado em `http://127.0.0.1:4200`.
 
 APIs esperadas em desenvolvimento:
 
 - InventoryService: `http://localhost:5001`
 - BillingService: `http://localhost:5002`
+
+Os backends permitem CORS para `http://localhost:4200` e `http://127.0.0.1:4200` em desenvolvimento.
 
 ## Build
 
@@ -79,7 +81,9 @@ Funcionalidades:
 - exibir erro amigável;
 - cadastrar produto com Reactive Forms;
 - validar campos obrigatórios, tamanho máximo e saldo não negativo;
-- voltar para a listagem com feedback de sucesso.
+- aceitar saldo inicial zero;
+- preservar formulário em erro;
+- voltar para a listagem com feedback de sucesso sem query param permanente.
 
 ## Decisões
 

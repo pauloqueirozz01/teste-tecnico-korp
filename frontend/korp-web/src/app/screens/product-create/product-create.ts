@@ -1,5 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { catchError, EMPTY, finalize } from 'rxjs';
 import { ProductFormComponent } from '../../components/products/product-form/product-form';
 import { ErrorMessageComponent } from '../../components/shared/error-message/error-message';
@@ -10,7 +10,7 @@ import { ProdutoService } from '../../core/services/produto.service';
 
 @Component({
   selector: 'app-product-create-screen',
-  imports: [RouterLink, PageHeaderComponent, ErrorMessageComponent, ProductFormComponent],
+  imports: [PageHeaderComponent, ErrorMessageComponent, ProductFormComponent],
   templateUrl: './product-create.html',
   styleUrl: './product-create.css'
 })
@@ -21,6 +21,10 @@ export class ProductCreateScreen {
 
   protected readonly salvando = signal(false);
   protected readonly erro = signal<string | null>(null);
+
+  protected cancelar(): void {
+    this.router.navigate(['/produtos']);
+  }
 
   protected salvarProduto(request: CriarProdutoRequest): void {
     this.salvando.set(true);
@@ -36,7 +40,7 @@ export class ProductCreateScreen {
         finalize(() => this.salvando.set(false))
       )
       .subscribe(() => {
-        this.router.navigate(['/produtos'], { queryParams: { criado: '1' } });
+        this.router.navigate(['/produtos'], { state: { produtoCriado: true } });
       });
   }
 }

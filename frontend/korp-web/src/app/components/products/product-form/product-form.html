@@ -1,32 +1,56 @@
 <form class="product-form" [formGroup]="form" (ngSubmit)="submeter()">
   <div class="form-field">
     <label for="codigo">Código</label>
-    <input id="codigo" type="text" formControlName="codigo" maxlength="50" autocomplete="off" />
+    <input
+      id="codigo"
+      type="text"
+      formControlName="codigo"
+      maxlength="50"
+      autocomplete="off"
+      [attr.aria-invalid]="campoInvalido('codigo')"
+      aria-describedby="codigo-erro"
+    />
     @if (campoInvalido('codigo')) {
-      <p class="field-error">Informe um código com no máximo 50 caracteres.</p>
+      <p id="codigo-erro" class="field-error">{{ mensagemErro('codigo') }}</p>
     }
   </div>
 
   <div class="form-field">
     <label for="descricao">Descrição</label>
-    <input id="descricao" type="text" formControlName="descricao" maxlength="200" autocomplete="off" />
+    <input
+      id="descricao"
+      type="text"
+      formControlName="descricao"
+      maxlength="200"
+      autocomplete="off"
+      [attr.aria-invalid]="campoInvalido('descricao')"
+      aria-describedby="descricao-erro"
+    />
     @if (campoInvalido('descricao')) {
-      <p class="field-error">Informe uma descrição com no máximo 200 caracteres.</p>
+      <p id="descricao-erro" class="field-error">{{ mensagemErro('descricao') }}</p>
     }
   </div>
 
   <div class="form-field compact">
     <label for="saldo">Saldo inicial</label>
-    <input id="saldo" type="number" formControlName="saldo" min="0" inputmode="numeric" />
+    <input
+      id="saldo"
+      type="number"
+      formControlName="saldo"
+      min="0"
+      inputmode="numeric"
+      [attr.aria-invalid]="campoInvalido('saldo')"
+      aria-describedby="saldo-erro"
+    />
     @if (campoInvalido('saldo')) {
-      <p class="field-error">O saldo inicial não pode ser negativo.</p>
+      <p id="saldo-erro" class="field-error">{{ mensagemErro('saldo') }}</p>
     }
   </div>
 
   <div class="form-actions">
-    <ng-content select="[form-secondary-action]" />
+    <button type="button" class="secondary-button" (click)="cancelar.emit()">Cancelar</button>
     <button type="submit" [disabled]="salvando()">
-      {{ salvando() ? 'Salvando...' : 'Salvar produto' }}
+      {{ salvando() ? 'Cadastrando...' : 'Cadastrar produto' }}
     </button>
   </div>
 </form>

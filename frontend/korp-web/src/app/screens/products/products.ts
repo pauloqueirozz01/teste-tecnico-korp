@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
-import { catchError, finalize, of } from 'rxjs';
+import { Router, RouterLink } from '@angular/router';
+import { catchError, EMPTY, finalize } from 'rxjs';
 import { ProductTableComponent } from '../../components/products/product-table/product-table';
 import { EmptyStateComponent } from '../../components/shared/empty-state/empty-state';
 import { ErrorMessageComponent } from '../../components/shared/error-message/error-message';
@@ -26,7 +26,7 @@ import { ProdutoService } from '../../core/services/produto.service';
 export class ProductsScreen implements OnInit {
   private readonly produtoService = inject(ProdutoService);
   private readonly apiErrorService = inject(ApiErrorService);
-  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
 
   protected readonly produtos = signal<Produto[]>([]);
   protected readonly carregando = signal(true);
@@ -34,8 +34,9 @@ export class ProductsScreen implements OnInit {
   protected readonly sucesso = signal<string | null>(null);
 
   ngOnInit(): void {
-    if (this.route.snapshot.queryParamMap.get('criado') === '1') {
+    if (history.state?.produtoCriado === true) {
       this.sucesso.set('Produto cadastrado com sucesso.');
+      this.router.navigate([], { replaceUrl: true, state: {} });
     }
 
     this.carregarProdutos();
@@ -49,8 +50,13 @@ export class ProductsScreen implements OnInit {
       .listarProdutos()
       .pipe(
         catchError((erro) => {
-          this.erro.set(this.apiErrorService.mapear(erro).mensagem);
-          return of([]);
+          const erroAplicacao = this.apiErrorService.mapear(erro);
+          this.erro.set(
+            erroAplicacao.status === 0 || erroAplicacao.status === 503
+              ? 'O serviço de produtos está temporariamente indisponível. Tente novamente em alguns instantes.'
+              : erroAplicacao.mensagem || 'Não foi possível carregar os produtos. Tente novamente.'
+          );
+          return EMPTY;
         }),
         finalize(() => this.carregando.set(false))
       )

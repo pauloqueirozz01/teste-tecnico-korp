@@ -366,7 +366,7 @@ inventory: 'http://localhost:5001'
 billing: 'http://localhost:5002'
 ```
 
-Essas URLs ficam em `src/environments/environment.ts` e são expostas aos services por `API_CONFIG`. O frontend usa CORS direto para as APIs, sem proxy Angular nesta etapa, porque os backends já permitem `http://localhost:4200` em desenvolvimento.
+Essas URLs ficam em `src/environments/environment.ts` e são expostas aos services por `API_CONFIG`. O frontend usa CORS direto para as APIs, sem proxy Angular nesta etapa, porque os backends já permitem `http://localhost:4200` e `http://127.0.0.1:4200` em desenvolvimento.
 
 Comandos:
 
@@ -412,9 +412,9 @@ dotnet run --project backend/BillingService/BillingService.csproj --launch-profi
 - InventoryService HTTPS: `https://localhost:7001`
 - BillingService HTTP: `http://localhost:5002`
 - BillingService HTTPS: `https://localhost:7002`
-- Frontend Angular planejado: `http://localhost:4200`
+- Frontend Angular: `http://localhost:4200` ou `http://127.0.0.1:4200`
 
-Em ambiente de desenvolvimento, os serviços estão preparados para aceitar CORS a partir de `http://localhost:4200`.
+Em ambiente de desenvolvimento, os serviços estão preparados para aceitar CORS a partir de `http://localhost:4200` e `http://127.0.0.1:4200`.
 
 ## Health checks
 

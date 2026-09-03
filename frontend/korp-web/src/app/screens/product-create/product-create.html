@@ -7,6 +7,8 @@
   <app-error-message [mensagem]="erro()!" />
 }
 
-<app-product-form [salvando]="salvando()" (salvar)="salvarProduto($event)">
-  <a form-secondary-action routerLink="/produtos">Voltar</a>
-</app-product-form>
+<app-product-form
+  [salvando]="salvando()"
+  (salvar)="salvarProduto($event)"
+  (cancelar)="cancelar()"
+/>
