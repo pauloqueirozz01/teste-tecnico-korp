@@ -1,0 +1,25 @@
+<div class="table-shell">
+  <table>
+    <caption>
+      Produtos cadastrados
+    </caption>
+    <thead>
+      <tr>
+        <th scope="col">Código</th>
+        <th scope="col">Descrição</th>
+        <th scope="col" class="numeric">Saldo</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (produto of produtos(); track produto.id) {
+        <tr>
+          <td data-label="Código">
+            <strong>{{ produto.codigo }}</strong>
+          </td>
+          <td data-label="Descrição">{{ produto.descricao }}</td>
+          <td data-label="Saldo" class="numeric">{{ produto.saldo }}</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

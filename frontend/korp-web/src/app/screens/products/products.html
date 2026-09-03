@@ -5,7 +5,24 @@
   <a page-action class="primary-action" routerLink="/produtos/novo">Novo produto</a>
 </app-page-header>
 
-<app-empty-state
-  titulo="Gerenciamento de produtos em preparação"
-  descricao="A listagem e o cadastro completo serão adicionados na próxima etapa do frontend."
-/>
+@if (sucesso()) {
+  <p class="success-message" role="status">{{ sucesso() }}</p>
+}
+
+@if (carregando()) {
+  <app-loading mensagem="Carregando produtos..." />
+} @else if (erro()) {
+  <div class="state-stack">
+    <app-error-message [mensagem]="erro()!" />
+    <button type="button" class="secondary-action" (click)="carregarProdutos()">Tentar novamente</button>
+  </div>
+} @else if (produtos().length === 0) {
+  <app-empty-state
+    titulo="Nenhum produto cadastrado"
+    descricao="Cadastre um produto para disponibilizar saldo ao processo de emissão."
+  >
+    <a class="secondary-action" routerLink="/produtos/novo">Cadastrar produto</a>
+  </app-empty-state>
+} @else {
+  <app-product-table [produtos]="produtos()" />
+}

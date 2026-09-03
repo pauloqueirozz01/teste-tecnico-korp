@@ -1,0 +1,32 @@
+<form class="product-form" [formGroup]="form" (ngSubmit)="submeter()">
+  <div class="form-field">
+    <label for="codigo">Código</label>
+    <input id="codigo" type="text" formControlName="codigo" maxlength="50" autocomplete="off" />
+    @if (campoInvalido('codigo')) {
+      <p class="field-error">Informe um código com no máximo 50 caracteres.</p>
+    }
+  </div>
+
+  <div class="form-field">
+    <label for="descricao">Descrição</label>
+    <input id="descricao" type="text" formControlName="descricao" maxlength="200" autocomplete="off" />
+    @if (campoInvalido('descricao')) {
+      <p class="field-error">Informe uma descrição com no máximo 200 caracteres.</p>
+    }
+  </div>
+
+  <div class="form-field compact">
+    <label for="saldo">Saldo inicial</label>
+    <input id="saldo" type="number" formControlName="saldo" min="0" inputmode="numeric" />
+    @if (campoInvalido('saldo')) {
+      <p class="field-error">O saldo inicial não pode ser negativo.</p>
+    }
+  </div>
+
+  <div class="form-actions">
+    <ng-content select="[form-secondary-action]" />
+    <button type="submit" [disabled]="salvando()">
+      {{ salvando() ? 'Salvando...' : 'Salvar produto' }}
+    </button>
+  </div>
+</form>

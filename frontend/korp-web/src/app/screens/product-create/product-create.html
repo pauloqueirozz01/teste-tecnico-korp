@@ -3,7 +3,10 @@
   descricao="Cadastre produtos para disponibilizar saldo ao processo de emissão."
 />
 
-<app-empty-state
-  titulo="Cadastro de produto em preparação"
-  descricao="O formulário será conectado ao serviço de produtos na próxima etapa."
-/>
+@if (erro()) {
+  <app-error-message [mensagem]="erro()!" />
+}
+
+<app-product-form [salvando]="salvando()" (salvar)="salvarProduto($event)">
+  <a form-secondary-action routerLink="/produtos">Voltar</a>
+</app-product-form>

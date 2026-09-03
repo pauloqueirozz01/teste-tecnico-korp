@@ -10,7 +10,7 @@ Construir uma aplicação simples para gerenciamento de produtos, estoque e emis
 
 ## Arquitetura
 
-- `frontend/korp-web`: frontend Angular funcional com componentes standalone, roteamento e clients HTTP preparados.
+- `frontend/korp-web`: frontend Angular funcional com componentes standalone, roteamento, gestão de produtos e clients HTTP preparados.
 - `backend/InventoryService`: API ASP.NET Core funcional para produtos, validação de estoque e consumo de estoque.
 - `backend/BillingService`: API ASP.NET Core funcional para criação, consulta, processamento e download de notas fiscais.
 - `backend/tests`: projetos de teste xUnit.
@@ -351,6 +351,14 @@ Rotas iniciais:
 
 As screens são carregadas com `loadComponent`, mantendo lazy loading desde a fundação. As páginas ainda são estruturais; os fluxos completos de produtos e notas fiscais ficam para as próximas specs.
 
+A gestão de produtos já está implementada:
+
+- listagem em `/produtos`;
+- cadastro em `/produtos/novo`;
+- validações de código, descrição e saldo inicial;
+- loading, empty state, erro amigável e feedback de sucesso;
+- consumo real do InventoryService por `ProdutoService`.
+
 Configuração das APIs:
 
 ```ts
@@ -489,9 +497,10 @@ Planejado para specs futuras:
 
 1. A interface Angular exibe um indicador de processamento.
 2. O Angular atualiza a interface após sucesso ou falha.
-3. Retry e circuit breaker são adicionados na SPEC-005.
+3. As telas de notas fiscais consomem o BillingService.
 
 ## Planejado
 
-- Retry e circuit breaker para resiliência avançada.
-- Frontend Angular.
+- Criação funcional de nota fiscal no Angular.
+- Listagem e detalhes de notas fiscais no Angular.
+- Processamento e download de nota fiscal pela interface.

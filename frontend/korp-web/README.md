@@ -59,12 +59,27 @@ src/app/
 ## Rotas
 
 - `/`
-- `/produtos`
-- `/produtos/novo`
+- `/produtos`: listagem de produtos
+- `/produtos/novo`: cadastro de produto
 - `/notas-fiscais`
 - `/notas-fiscais/nova`
 - `/notas-fiscais/:id`
 - `/**`
+
+## Produtos
+
+O fluxo de produtos consome o InventoryService real configurado em `environment`.
+
+Funcionalidades:
+
+- carregar produtos cadastrados;
+- exibir código, descrição e saldo;
+- exibir estado vazio;
+- exibir loading;
+- exibir erro amigável;
+- cadastrar produto com Reactive Forms;
+- validar campos obrigatórios, tamanho máximo e saldo não negativo;
+- voltar para a listagem com feedback de sucesso.
 
 ## Decisões
 

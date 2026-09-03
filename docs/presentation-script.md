@@ -80,6 +80,17 @@ Este arquivo é intencionalmente apenas uma estrutura inicial. Ele será complet
 - Validação
 - Mapeamento
 
+## 8.1. Gestão de produtos no Angular
+
+- Abrir `/produtos` e mostrar loading, tabela ou estado vazio.
+- Explicar que a screen usa `ngOnInit` para buscar dados iniciais.
+- Explicar `ProdutoService` retornando `Observable<Produto[]>`.
+- Explicar uso de `catchError` para erro amigável e `finalize` para encerrar loading.
+- Abrir `/produtos/novo`.
+- Mostrar Reactive Forms com validação de código, descrição e saldo.
+- Cadastrar produto e voltar para a listagem com feedback de sucesso.
+- Reforçar que não foram implementados edição, exclusão ou estoque manual nesta etapa.
+
 ## 9. Testes
 
 - Testes backend

@@ -66,6 +66,36 @@ Signals são usados apenas para estado local simples do layout, como menu mobile
 
 Não foram adicionadas bibliotecas visuais externas, NgRx, proxy, SSR, PWA ou autenticação.
 
+## Gestão de Produtos no Angular
+
+A SPEC-007 implementou o fluxo funcional de produtos consumindo o InventoryService real por `ProdutoService`.
+
+Tela `/produtos`:
+
+- usa `ngOnInit` para carregar a listagem inicial, porque a screen precisa buscar dados ao ser ativada pela rota;
+- usa RxJS com `catchError` para mapear falhas via `ApiErrorService`;
+- usa `finalize` para encerrar o estado de loading;
+- mostra tabela com código, descrição e saldo;
+- mostra empty state quando não há produtos;
+- mostra erro amigável e ação para tentar novamente.
+
+Tela `/produtos/novo`:
+
+- usa Reactive Forms;
+- valida código obrigatório com máximo de 50 caracteres;
+- valida descrição obrigatória com máximo de 200 caracteres;
+- valida saldo inicial obrigatório e não negativo;
+- usa `ProdutoService.criarProduto`;
+- usa `catchError` e `finalize` para erro e loading;
+- após sucesso, navega para `/produtos?criado=1`, onde a listagem exibe o feedback de sucesso e recarrega os produtos.
+
+Componentes adicionados em `components/products`:
+
+- `ProductTableComponent`;
+- `ProductFormComponent`.
+
+Não foram implementados edição, exclusão, ajuste manual de estoque ou funcionalidades de Nota Fiscal nesta SPEC.
+
 ## Limites dos microsserviços
 
 InventoryService é responsável por produtos, estoque, validação de estoque e consumo de estoque.
