@@ -2,7 +2,9 @@
 
 ## Arquitetura Angular
 
-O frontend será construído com Angular, TypeScript, RxJS e componentes standalone. As telas de rota ficarão em `src/app/screens`, enquanto componentes reutilizáveis de apresentação ficarão em `src/app/components`.
+O frontend foi iniciado na SPEC-006 em `frontend/korp-web` com Angular `20.3.30`, Angular CLI `20.3.35`, TypeScript `5.9.3`, RxJS `7.8.2` e pnpm `11.15.1`. A aplicação usa componentes standalone, sem `AppModule`, com bootstrap por `app.config.ts`.
+
+As telas de rota ficam em `src/app/screens`, enquanto componentes reutilizáveis de apresentação ficam em `src/app/components`.
 
 Estrutura planejada:
 
@@ -15,6 +17,54 @@ Estrutura planejada:
 - `src/app/screens`: telas de rota para dashboard, produtos, criação de produto, notas fiscais, criação de nota e detalhes da nota.
 
 Decisão de engenharia: o frontend evitará bibliotecas de gerenciamento global de estado enquanto serviços Angular e fluxos RxJS simples forem suficientes. Isso mantém a avaliação objetiva e evita complexidade desnecessária.
+
+## Fundação Angular da SPEC-006
+
+Rotas configuradas em `app.routes.ts`:
+
+- `/`
+- `/produtos`
+- `/produtos/novo`
+- `/notas-fiscais`
+- `/notas-fiscais/nova`
+- `/notas-fiscais/:id`
+- `/**`
+
+As screens são carregadas com `loadComponent`, aplicando lazy loading desde a fundação. O `App` contém apenas o layout principal, cabeçalho, navegação e `<router-outlet>`.
+
+Componentes compartilhados iniciais:
+
+- `PageHeaderComponent`: título, descrição e ação principal.
+- `LoadingComponent`: indicador acessível de carregamento.
+- `ErrorMessageComponent`: apresentação visual de erros.
+- `EmptyStateComponent`: estado vazio para listas e placeholders.
+
+Services HTTP:
+
+- `ProdutoService`: `listarProdutos`, `buscarProduto`, `criarProduto`.
+- `NotaFiscalService`: `listarNotas`, `buscarNota`, `criarNota`, `processarNota`, `baixarArquivo`.
+
+Os services retornam `Observable<T>` e usam `HttpClient` por injeção. O padrão previsto para loading nas próximas screens é manter estado local simples e usar `finalize` em operações com subscribe manual quando necessário. Subscriptions manuais devem ser evitadas quando `async` pipe ou fluxo declarativo resolverem.
+
+Models TypeScript refletem os DTOs reais serializados em camelCase. GUIDs são `string` e datas ISO são `string`, sem conversão automática para `Date`.
+
+A configuração das APIs fica em `src/environments` e `API_CONFIG`:
+
+- InventoryService: `http://localhost:5001`
+- BillingService: `http://localhost:5002`
+
+Foi escolhida comunicação direta com as APIs usando CORS já configurado nos backends para `http://localhost:4200`; não há proxy Angular nesta etapa.
+
+Tratamento de erros:
+
+- `ErroApi` representa o contrato `{ codigo, mensagem, status }`.
+- `ApiErrorService` prioriza a mensagem segura retornada pelo backend.
+- indisponibilidade recebe fallback em pt-BR.
+- o interceptor global foi criado apenas como ponto técnico comum, sem interpretar regras de negócio.
+
+Signals são usados apenas para estado local simples do layout, como menu mobile. RxJS permanece responsável pelos fluxos HTTP. Lifecycle hooks não foram adicionados artificialmente; serão usados nas próximas screens quando houver carregamento inicial real.
+
+Não foram adicionadas bibliotecas visuais externas, NgRx, proxy, SSR, PWA ou autenticação.
 
 ## Limites dos microsserviços
 

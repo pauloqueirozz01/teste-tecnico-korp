@@ -1,0 +1,7 @@
+<section class="empty-state">
+  <h2>{{ titulo() }}</h2>
+  @if (descricao()) {
+    <p>{{ descricao() }}</p>
+  }
+  <ng-content />
+</section>

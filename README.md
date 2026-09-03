@@ -10,7 +10,7 @@ Construir uma aplicação simples para gerenciamento de produtos, estoque e emis
 
 ## Arquitetura
 
-- `frontend/korp-web`: frontend Angular planejado com componentes standalone.
+- `frontend/korp-web`: frontend Angular funcional com componentes standalone, roteamento e clients HTTP preparados.
 - `backend/InventoryService`: API ASP.NET Core funcional para produtos, validação de estoque e consumo de estoque.
 - `backend/BillingService`: API ASP.NET Core funcional para criação, consulta, processamento e download de notas fiscais.
 - `backend/tests`: projetos de teste xUnit.
@@ -31,7 +31,11 @@ As especificações internas de implementação ficam em `docs/specs/`, mas essa
 - Microsoft.Extensions.Http.Resilience `10.9.0`
 - Docker Compose
 - dotnet-ef como ferramenta local em `backend/dotnet-tools.json`
-- Angular, TypeScript e RxJS planejados para o frontend
+- Angular `20.3.30`
+- Angular CLI `20.3.35`
+- TypeScript `5.9.3`
+- RxJS `7.8.2`
+- pnpm `11.15.1`
 
 ## Idioma do projeto
 
@@ -315,6 +319,58 @@ As credenciais presentes no `docker-compose.yml` e em `appsettings.Development.j
 - senha: `korp_dev_password`
 
 Nenhuma senha, token, chave, credencial ou connection string real deve ser versionada.
+
+## Frontend Angular
+
+A aplicação Angular fica em `frontend/korp-web` e usa componentes standalone, `app.config.ts`, `app.routes.ts`, Angular Router, HttpClient e RxJS. O projeto foi criado com Angular CLI `20.3.35`, Angular `20.3.30`, TypeScript `5.9.3`, Node `24.12.0` no ambiente do pnpm e pnpm `11.15.1`.
+
+Estrutura principal:
+
+```text
+frontend/korp-web/src/app/
+├── core/
+│   ├── config/
+│   ├── interceptors/
+│   ├── models/
+│   └── services/
+├── components/shared/
+└── screens/
+```
+
+Rotas iniciais:
+
+```text
+/                   Dashboard
+/produtos           Produtos
+/produtos/novo      Cadastro de produto
+/notas-fiscais      Notas fiscais
+/notas-fiscais/nova Nova nota fiscal
+/notas-fiscais/:id  Detalhes da nota fiscal
+/**                 Página não encontrada
+```
+
+As screens são carregadas com `loadComponent`, mantendo lazy loading desde a fundação. As páginas ainda são estruturais; os fluxos completos de produtos e notas fiscais ficam para as próximas specs.
+
+Configuração das APIs:
+
+```ts
+inventory: 'http://localhost:5001'
+billing: 'http://localhost:5002'
+```
+
+Essas URLs ficam em `src/environments/environment.ts` e são expostas aos services por `API_CONFIG`. O frontend usa CORS direto para as APIs, sem proxy Angular nesta etapa, porque os backends já permitem `http://localhost:4200` em desenvolvimento.
+
+Comandos:
+
+```bash
+cd frontend/korp-web
+pnpm install
+pnpm start
+pnpm build
+pnpm test --watch=false --source-map=false
+```
+
+O projeto não possui lint configurado. Prettier foi criado pelo Angular CLI no `package.json`, mas não há script dedicado de formatação.
 
 ## Como iniciar os bancos
 

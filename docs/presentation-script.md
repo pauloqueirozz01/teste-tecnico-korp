@@ -62,12 +62,15 @@ Este arquivo é intencionalmente apenas uma estrutura inicial. Ele será complet
 
 ## 7. Implementação frontend
 
-- Telas
-- Componentes reutilizáveis
-- Serviços
-- Uso de RxJS
-- Lifecycle hooks do Angular
-- Interface obrigatoriamente em Português Brasileiro
+- Aplicação em `frontend/korp-web` com Angular 20 e componentes standalone.
+- `app.config.ts` concentra providers modernos, incluindo Router e HttpClient.
+- `app.routes.ts` define as páginas e usa `loadComponent` para lazy loading.
+- `screens` representam páginas de rota; `components/shared` concentra UI reutilizável.
+- `ProdutoService` e `NotaFiscalService` encapsulam chamadas HTTP e retornam `Observable<T>`.
+- RxJS aparece naturalmente nos services HTTP e será usado com `finalize`, `catchError` e `switchMap` quando os fluxos completos forem implementados.
+- Signals são usados para estado local simples, como menu mobile.
+- Lifecycle hooks não foram adicionados sem necessidade; `ngOnInit` será usado quando uma screen precisar carregar dados reais ao iniciar.
+- Interface obrigatoriamente em Português Brasileiro.
 
 ## 8. Uso de LINQ
 

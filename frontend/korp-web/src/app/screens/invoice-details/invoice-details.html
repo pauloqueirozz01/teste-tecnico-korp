@@ -1,0 +1,13 @@
+<app-page-header
+  titulo="Detalhes da nota fiscal"
+  descricao="Acompanhe os dados da nota, status, processamento e arquivo gerado."
+/>
+
+<app-empty-state
+  titulo="Detalhes em preparação"
+  descricao="A tela já recebe o identificador da rota e será conectada ao BillingService posteriormente."
+>
+  @if (notaFiscalId) {
+    <p class="route-value">Identificador: {{ notaFiscalId }}</p>
+  }
+</app-empty-state>

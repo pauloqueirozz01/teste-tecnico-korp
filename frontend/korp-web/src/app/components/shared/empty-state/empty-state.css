@@ -1,0 +1,19 @@
+.empty-state {
+  border: 1px dashed var(--color-border);
+  border-radius: 8px;
+  padding: 28px;
+  background: var(--color-surface);
+  text-align: center;
+}
+
+h2 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+p {
+  max-width: 520px;
+  margin: 8px auto 0;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+}

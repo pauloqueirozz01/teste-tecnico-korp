@@ -1,0 +1,43 @@
+.shortcut-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.shortcut-card {
+  display: grid;
+  gap: 8px;
+  min-height: 160px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 20px;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+  text-decoration: none;
+}
+
+.shortcut-card:hover {
+  border-color: var(--color-primary);
+}
+
+.shortcut-label {
+  color: var(--color-primary-strong);
+  font-weight: 700;
+  font-size: 0.86rem;
+}
+
+strong {
+  font-size: 1.2rem;
+}
+
+p {
+  margin: 0;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+}
+
+@media (max-width: 720px) {
+  .shortcut-grid {
+    grid-template-columns: 1fr;
+  }
+}
